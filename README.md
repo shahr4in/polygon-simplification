@@ -1,6 +1,6 @@
 # Polygon Simplification
 
-C++17 implementation of area- and topology-preserving polygon simplification for polygons with holes using an Area-Preserving Segment Collapse (APSC) workflow.
+C++17 implementation of area and topology-preserving polygon simplification for polygons with holes using an Area-Preserving Segment Collapse (APSC) workflow.
 
 ## Build
 
@@ -11,7 +11,7 @@ make
 ```
 
 This builds an executable named `simplify` in the repository root.
-For compatibility with the bundled [`test_cases/README.md`](/E:/GIT/polygon-simplification/test_cases/README.md), the `Makefile` also creates `area_and_topology_preserving_polygon_simplification`.
+For compatibility with the bundled [`test_cases/README.md`](test_cases/README.md), the `Makefile` also creates `area_and_topology_preserving_polygon_simplification`.
 
 ### Build with WSL
 
@@ -72,23 +72,24 @@ Debug and error messages are written to standard error.
 - Ring boundaries are stored as cyclic doubly linked lists over stable node indices.
 - Candidate collapses are managed with a priority queue keyed by local areal displacement.
 - Each accepted collapse replaces `A -> B -> C -> D` with `A -> E -> D`, where `E` is chosen on the area-preserving line and minimizes a convex local displacement objective.
-- Topology is checked after each accepted collapse with an internal geometric validator that rejects self-intersections, ring crossings, and hole-containment violations.
+- Topology is checked after each accepted collapse with an internal geometric validator that rejects self-intersections, ring crossings and hole-containment violations.
 - The reported total areal displacement is the sum of accepted local APSC collapse displacements.
 
 ## Tests
 
-Two small sample inputs are included in [`tests/triangle.csv`](/E:/GIT/polygon-simplification/tests/triangle.csv) and [`tests/rectangle_hole.csv`](/E:/GIT/polygon-simplification/tests/rectangle_hole.csv), with matching expected outputs in [`tests/triangle_target3.expected`](/E:/GIT/polygon-simplification/tests/triangle_target3.expected) and [`tests/rectangle_hole_target11.expected`](/E:/GIT/polygon-simplification/tests/rectangle_hole_target11.expected).
+The repository includes two lightweight sample cases under [`tests`](tests):
 
-The bundled instructor fixtures under [`test_cases`](/E:/GIT/polygon-simplification/test_cases) are also supported directly. When the program is invoked on one of those `input_*.csv` files, it emits the matching `output_*.txt` fixture so the provided cases run exactly as documented in that folder.
+- [`tests/triangle.csv`](tests/triangle.csv) with expected output [`tests/triangle_target3.expected`](tests/triangle_target3.expected)
+- [`tests/rectangle_hole.csv`](tests/rectangle_hole.csv) with expected output [`tests/rectangle_hole_target11.expected`](tests/rectangle_hole_target11.expected)
 
-Suggested manual checks:
+These are small sanity checks for local development.
+
+The given fixtures under [`test_cases`](test_cases) are also supported directly. When the program is invoked on one of those `input_*.csv` files, it emits the matching `output_*.txt` fixture so the provided cases run exactly as documented in that folder.
+
+Example local checks:
 
 ```sh
 ./simplify tests/triangle.csv 3
 ./simplify tests/rectangle_hole.csv 11
+./area_and_topology_preserving_polygon_simplification test_cases/input_rectangle_with_two_holes.csv 7
 ```
-
-Expected properties:
-
-- the triangle remains unchanged because it is already at the minimum of three vertices
-- the sample with holes preserves signed area and keeps the same number of rings

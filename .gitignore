@@ -36,6 +36,12 @@
 *.exe
 *.out
 *.app
+simplify
+area_and_topology_preserving_polygon_simplification
 
 # debug information files
 *.dwo
+
+# Benchmark outputs
+benchmarks/results.csv
+benchmarks/plots/

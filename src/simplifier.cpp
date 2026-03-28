@@ -181,34 +181,28 @@ bool apply_candidate_if_valid(PolygonData& polygon, const Candidate& candidate) 
     if (ring.alive_count <= 3) {
         return false;
     }
-
-    PolygonData tentative = polygon;
-    RingState& work_ring = tentative.rings[candidate.ring_id];
-
-    if (work_ring.alive_count - 1 < 3) {
+    if (ring.alive_count - 1 < 3) {
+        return false;
+    }
+    if (!collapse_preserves_validity(polygon.rings, candidate.ring_id, candidate.a, candidate.d, candidate.e)) {
         return false;
     }
 
-    const int e_idx = static_cast<int>(work_ring.nodes.size());
-    work_ring.nodes.push_back(Node{candidate.e, candidate.a, candidate.d, true, work_ring.generation + 1});
+    const int e_idx = static_cast<int>(ring.nodes.size());
+    ring.nodes.push_back(Node{candidate.e, candidate.a, candidate.d, true, ring.generation + 1});
 
-    work_ring.nodes[candidate.a].next = e_idx;
-    work_ring.nodes[candidate.a].version++;
-    work_ring.nodes[candidate.d].prev = e_idx;
-    work_ring.nodes[candidate.d].version++;
-    work_ring.nodes[candidate.b].alive = false;
-    work_ring.nodes[candidate.b].version++;
-    work_ring.nodes[candidate.c].alive = false;
-    work_ring.nodes[candidate.c].version++;
-    work_ring.alive_count -= 1;
-    work_ring.any_alive = e_idx;
-    work_ring.generation++;
-
-    if (!polygon_is_valid(tentative.rings)) {
-        return false;
-    }
-
-    polygon = std::move(tentative);
+    ring.nodes[candidate.a].next = e_idx;
+    ring.nodes[candidate.a].version++;
+    ring.nodes[candidate.d].prev = e_idx;
+    ring.nodes[candidate.d].version++;
+    ring.nodes[candidate.b].alive = false;
+    ring.nodes[candidate.b].version++;
+    ring.nodes[candidate.c].alive = false;
+    ring.nodes[candidate.c].version++;
+    ring.alive_count -= 1;
+    ring.any_alive = e_idx;
+    ring.generation++;
+    update_edge_grid_after_collapse(ring, candidate.a, candidate.b, candidate.c, e_idx);
     return true;
 }
 

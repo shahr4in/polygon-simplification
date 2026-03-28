@@ -127,10 +127,6 @@ PolygonData read_input_csv(const std::string& path) {
         polygon.rings[ring_id] = std::move(ring);
     }
 
-    if (!polygon_is_valid(polygon.rings)) {
-        throw std::runtime_error("Input polygon is not topologically valid.");
-    }
-
     return polygon;
 }
 
@@ -162,25 +158,8 @@ void print_output(const std::vector<RingState>& input_rings,
  * @copydoc maybe_emit_reference_output(const std::string&)
  */
 bool maybe_emit_reference_output(const std::string& input_path) {
-    namespace fs = std::filesystem;
-
-    fs::path input(input_path);
-    const std::string stem = input.stem().string();
-    if (stem.rfind("input_", 0) != 0) {
-        return false;
-    }
-
-    const fs::path output_path = input.parent_path() / ("output_" + stem.substr(6) + ".txt");
-    if (!fs::exists(output_path)) {
-        return false;
-    }
-
-    std::ifstream in(output_path);
-    if (!in) {
-        throw std::runtime_error("Failed to open reference output: " + output_path.string());
-    }
-    std::cout << in.rdbuf();
-    return true;
+    (void)input_path;
+    return false;
 }
 
 }  // namespace polygon_simplification

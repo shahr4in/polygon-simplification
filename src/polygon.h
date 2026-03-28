@@ -5,6 +5,7 @@
 
 #include <array>
 #include <cstdint>
+#include <unordered_map>
 #include <vector>
 
 namespace polygon_simplification {
@@ -41,6 +42,22 @@ struct RingState {
     std::uint64_t generation = 0;
     /** @brief Signed area of the original input ring. */
     double original_signed_area = 0.0;
+    /** @brief Minimum x-coordinate of the active ring bounding box. */
+    double min_x = 0.0;
+    /** @brief Maximum x-coordinate of the active ring bounding box. */
+    double max_x = 0.0;
+    /** @brief Minimum y-coordinate of the active ring bounding box. */
+    double min_y = 0.0;
+    /** @brief Maximum y-coordinate of the active ring bounding box. */
+    double max_y = 0.0;
+    /** @brief Cell size used by the uniform-grid edge index. */
+    double grid_cell_size = 1.0;
+    /** @brief Mapping from grid cell key to active edge start indices. */
+    std::unordered_map<long long, std::vector<int>> edge_grid;
+    /** @brief Reverse mapping from edge start index to occupied grid cells. */
+    std::vector<std::vector<long long>> edge_grid_cells;
+    /** @brief Whether the current edge grid matches the active ring state. */
+    bool edge_grid_ready = false;
 };
 
 /**
@@ -114,6 +131,33 @@ int total_vertex_count(const std::vector<RingState>& rings);
  * @return `true` if the polygon is non-degenerate, non-self-intersecting, and hole-consistent.
  */
 bool polygon_is_valid(const std::vector<RingState>& rings);
+
+/**
+ * @brief Tests whether applying a local collapse candidate would preserve polygon validity.
+ * @param rings Current polygon rings before the collapse.
+ * @param ring_id Ring being modified.
+ * @param a Index of vertex A in the local chain A-B-C-D.
+ * @param d Index of vertex D in the local chain A-B-C-D.
+ * @param e Proposed replacement point E.
+ * @return `true` if replacing A-B-C-D with A-E-D preserves local and global validity.
+ */
+bool collapse_preserves_validity(std::vector<RingState>& rings, int ring_id, int a, int d, const Vec2& e);
+
+/**
+ * @brief Builds the uniform-grid spatial index for a ring if it is stale.
+ * @param ring Ring whose active edges should be indexed.
+ */
+void ensure_edge_grid(RingState& ring);
+
+/**
+ * @brief Updates the grid entries touched by one accepted collapse.
+ * @param ring Updated ring after the collapse has been committed.
+ * @param a Index of vertex A in the collapsed local chain.
+ * @param b Index of removed vertex B.
+ * @param c Index of removed vertex C.
+ * @param e Index of the newly inserted replacement vertex E.
+ */
+void update_edge_grid_after_collapse(RingState& ring, int a, int b, int c, int e);
 
 }  // namespace polygon_simplification
 

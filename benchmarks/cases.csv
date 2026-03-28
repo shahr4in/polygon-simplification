@@ -1,0 +1,12 @@
+case,input_path,target_vertices
+triangle,tests/triangle.csv,3
+rectangle_hole,tests/rectangle_hole.csv,11
+rectangle_two_holes,tests/rectangle_two_holes.csv,7
+cushion_hexagonal_hole,tests/cushion_hexagonal_hole.csv,13
+blob_two_holes,tests/blob_two_holes.csv,17
+wavy_three_holes,tests/wavy_three_holes.csv,21
+lake_two_islands,tests/lake_two_islands.csv,17
+original_01,test_cases/input_original_01.csv,99
+original_02,test_cases/input_original_02.csv,99
+original_06,test_cases/input_original_06.csv,99
+original_09,test_cases/input_original_09.csv,99

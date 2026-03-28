@@ -45,3 +45,6 @@ area_and_topology_preserving_polygon_simplification
 # Benchmark outputs
 benchmarks/results.csv
 benchmarks/plots/
+
+# Local reference artifacts
+area_and_topology_preserving_polygon_simplification.pdf

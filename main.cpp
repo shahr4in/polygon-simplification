@@ -10,6 +10,12 @@
 #include <string>
 #include <vector>
 
+/**
+ * @brief Program entry point.
+ * @param argc Number of command-line arguments.
+ * @param argv Command-line argument vector.
+ * @return Exit status code.
+ */
 int main(int argc, char* argv[]) {
     try {
         if (argc != 3) {

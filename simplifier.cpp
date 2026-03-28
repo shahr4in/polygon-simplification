@@ -11,6 +11,9 @@
 
 namespace polygon_simplification {
 
+/**
+ * @copydoc compute_candidate(const RingState&, int)
+ */
 std::optional<Candidate> compute_candidate(const RingState& ring, int b_idx) {
     if (!ring.nodes[b_idx].alive || ring.alive_count < 4) {
         return std::nullopt;
@@ -44,8 +47,13 @@ std::optional<Candidate> compute_candidate(const RingState& ring, int b_idx) {
     const Vec2 e0 = perp * (-k / dot(ad, ad));
     const Vec2 u = ad * (1.0 / ad_len);
 
+    /**
+     * @brief One absolute-value term in the local displacement objective.
+     */
     struct Term {
+        /** @brief Coefficient of the line parameter t. */
         double alpha;
+        /** @brief Constant term after substituting the area-preserving line. */
         double beta;
     };
 
@@ -110,6 +118,9 @@ std::optional<Candidate> compute_candidate(const RingState& ring, int b_idx) {
     return candidate;
 }
 
+/**
+ * @copydoc candidate_is_still_current(const RingState&, const Candidate&)
+ */
 bool candidate_is_still_current(const RingState& ring, const Candidate& candidate) {
     const std::array<int, 4> ids{candidate.a, candidate.b, candidate.c, candidate.d};
     for (std::size_t i = 0; i < ids.size(); ++i) {
@@ -130,6 +141,9 @@ bool candidate_is_still_current(const RingState& ring, const Candidate& candidat
            ring.nodes[candidate.d].prev == candidate.c;
 }
 
+/**
+ * @copydoc enqueue_candidate(std::priority_queue<Candidate, std::vector<Candidate>, CandidateCompare>&, const RingState&, int)
+ */
 void enqueue_candidate(std::priority_queue<Candidate, std::vector<Candidate>, CandidateCompare>& pq,
                        const RingState& ring,
                        int b_idx) {
@@ -139,6 +153,9 @@ void enqueue_candidate(std::priority_queue<Candidate, std::vector<Candidate>, Ca
     }
 }
 
+/**
+ * @copydoc affected_b_positions_after_collapse(const RingState&, int, int, int)
+ */
 std::vector<int> affected_b_positions_after_collapse(const RingState& ring, int a, int e, int d) {
     std::vector<int> ids;
     const int a_prev = ring.nodes[a].prev;
@@ -153,6 +170,9 @@ std::vector<int> affected_b_positions_after_collapse(const RingState& ring, int 
     return ids;
 }
 
+/**
+ * @copydoc apply_candidate_if_valid(PolygonData&, const Candidate&)
+ */
 bool apply_candidate_if_valid(PolygonData& polygon, const Candidate& candidate) {
     RingState& ring = polygon.rings[candidate.ring_id];
     if (!candidate_is_still_current(ring, candidate)) {

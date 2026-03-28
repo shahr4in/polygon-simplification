@@ -16,6 +16,11 @@ namespace polygon_simplification {
 
 namespace {
 
+/**
+ * @brief Removes a single trailing carriage return from a text line.
+ * @param line Input line.
+ * @return The normalized line.
+ */
 std::string trim_trailing_carriage_return(std::string line) {
     if (!line.empty() && line.back() == '\r') {
         line.pop_back();
@@ -23,6 +28,11 @@ std::string trim_trailing_carriage_return(std::string line) {
     return line;
 }
 
+/**
+ * @brief Splits a simple comma-separated line into fields.
+ * @param line Input CSV row without embedded quoted commas.
+ * @return Parsed field strings.
+ */
 std::vector<std::string> split_csv_line(const std::string& line) {
     std::vector<std::string> parts;
     std::stringstream ss(line);
@@ -35,6 +45,9 @@ std::vector<std::string> split_csv_line(const std::string& line) {
 
 }  // namespace
 
+/**
+ * @copydoc read_input_csv(const std::string&)
+ */
 PolygonData read_input_csv(const std::string& path) {
     std::ifstream in(path);
     if (!in) {
@@ -121,6 +134,9 @@ PolygonData read_input_csv(const std::string& path) {
     return polygon;
 }
 
+/**
+ * @copydoc print_output(const std::vector<RingState>&, const std::vector<RingState>&, double)
+ */
 void print_output(const std::vector<RingState>& input_rings,
                   const std::vector<RingState>& output_rings,
                   double total_displacement) {
@@ -142,6 +158,9 @@ void print_output(const std::vector<RingState>& input_rings,
     std::cout << "Total areal displacement: " << total_displacement << '\n';
 }
 
+/**
+ * @copydoc maybe_emit_reference_output(const std::string&)
+ */
 bool maybe_emit_reference_output(const std::string& input_path) {
     namespace fs = std::filesystem;
 

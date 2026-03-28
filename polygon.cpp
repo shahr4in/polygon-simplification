@@ -8,6 +8,9 @@
 
 namespace polygon_simplification {
 
+/**
+ * @copydoc CandidateCompare::operator()(const Candidate&, const Candidate&) const
+ */
 bool CandidateCompare::operator()(const Candidate& lhs, const Candidate& rhs) const {
     if (std::abs(lhs.displacement - rhs.displacement) > 1e-12) {
         return lhs.displacement > rhs.displacement;
@@ -18,6 +21,9 @@ bool CandidateCompare::operator()(const Candidate& lhs, const Candidate& rhs) co
     return lhs.b > rhs.b;
 }
 
+/**
+ * @copydoc alive_ring_points(const RingState&)
+ */
 std::vector<Vec2> alive_ring_points(const RingState& ring) {
     std::vector<Vec2> points;
     if (ring.alive_count == 0 || ring.any_alive < 0) {
@@ -43,6 +49,9 @@ std::vector<Vec2> alive_ring_points(const RingState& ring) {
     return points;
 }
 
+/**
+ * @copydoc polygon_is_valid(const std::vector<RingState>&)
+ */
 bool polygon_is_valid(const std::vector<RingState>& rings) {
     if (rings.empty()) {
         return false;
@@ -119,6 +128,9 @@ bool polygon_is_valid(const std::vector<RingState>& rings) {
     return true;
 }
 
+/**
+ * @copydoc total_signed_area(const std::vector<RingState>&)
+ */
 double total_signed_area(const std::vector<RingState>& rings) {
     double area = 0.0;
     for (const auto& ring : rings) {
@@ -127,6 +139,9 @@ double total_signed_area(const std::vector<RingState>& rings) {
     return area;
 }
 
+/**
+ * @copydoc total_vertex_count(const std::vector<RingState>&)
+ */
 int total_vertex_count(const std::vector<RingState>& rings) {
     int total = 0;
     for (const auto& ring : rings) {

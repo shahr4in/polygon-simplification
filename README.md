@@ -21,7 +21,7 @@ On Windows, build this project from a WSL shell so `g++` and `make` are availabl
 
 ```sh
 wsl
-cd /mnt/e/GIT/polygon-simplification
+cd /path/to/polygon-simplification
 make
 ```
 
@@ -92,9 +92,7 @@ The repository includes several standalone sample cases under [`tests`](tests):
 - [`tests/wavy_three_holes.csv`](tests/wavy_three_holes.csv) with expected output [`tests/wavy_three_holes_target21.expected`](tests/wavy_three_holes_target21.expected)
 - [`tests/lake_two_islands.csv`](tests/lake_two_islands.csv) with expected output [`tests/lake_two_islands_target17.expected`](tests/lake_two_islands_target17.expected)
 
-These are small sanity checks for local development.
-
-The given fixtures under [`test_cases`](test_cases) can also be executed directly with the same program interface.
+The standalone `tests` cases provide lightweight regression coverage for local development. The bundled instructor fixtures under [`test_cases`](test_cases) can also be executed directly with the same program interface.
 
 Example local checks:
 
@@ -115,7 +113,7 @@ diff -u tests/triangle_target3.expected <(./simplify tests/triangle.csv 3)
 diff -u tests/rectangle_hole_target11.expected <(./simplify tests/rectangle_hole.csv 11)
 ```
 
-Local benchmark runs also confirm that the executable completed successfully on the following representative inputs:
+Recent local runs confirmed successful execution on the following representative inputs:
 
 | Case | Input vertices | Rings | Output vertices | Status |
 |---|---:|---:|---:|---|
@@ -127,6 +125,9 @@ Local benchmark runs also confirm that the executable completed successfully on 
 | `wavy_three_holes` | 43 | 4 | 21 | `ok` |
 | `lake_two_islands` | 81 | 3 | 17 | `ok` |
 | `original_01` | 1860 | 1 | 99 | `ok` |
+| `original_02` | 8605 | 1 | 99 | `ok` |
+| `original_06` | 14122 | 1 | 99 | `ok` |
+| `original_09` | 409998 | 1 | 99 | `ok` |
 
 The instructor `test_cases` inputs now run through the same simplification code path as every other input file, so they can be used as genuine correctness and performance tests.
 
@@ -137,7 +138,7 @@ The implementation checks correctness in two ways during simplification:
 - area preservation is enforced locally by constructing each replacement point on the area-preserving line, and the program reports total signed area for both input and output polygons
 - topology preservation is enforced after every accepted collapse by rejecting self-intersections, inter-ring crossings, degenerate edges, and invalid hole containment
 
-For the standalone fixtures in [`tests`](tests), the expected outputs preserve signed area exactly to the printed floating-point precision and keep the ring count unchanged.
+For the standalone fixtures in [`tests`](tests), the expected outputs preserve signed area to the printed floating-point precision and keep the ring count unchanged.
 
 ### Areal Displacement Summary
 
@@ -153,9 +154,9 @@ The program reports total areal displacement for each simplification run. On the
 | `wavy_three_holes` | 43 | 21 | 22 | 1.254156e+05 | 5700.7091 |
 | `lake_two_islands` | 81 | 17 | 64 | 1.004398e+05 | 1569.3719 |
 
-These values are useful for comparing runs of the same implementation, but they should not be over-interpreted across very different shapes because the raw displacement scale depends on the coordinate scale of the input polygon.
+These values are most useful for comparing runs of the same implementation. They should not be over-interpreted across very different shapes because the raw displacement scale depends on the coordinate scale of the input polygon.
 
-This repository currently implements the baseline greedy APSC workflow. It does not yet include non-greedy ordering, look-ahead selection, or a post-processing pass to reduce areal displacement or Hausdorff distance further.
+This implementation uses the baseline greedy APSC workflow. It does not currently include non-greedy ordering, look-ahead selection, or a post-processing pass to further reduce areal displacement or Hausdorff distance.
 
 ## Benchmarks
 
@@ -167,7 +168,7 @@ From WSL:
 
 ```sh
 wsl
-cd /mnt/e/GIT/polygon-simplification
+cd /path/to/polygon-simplification
 make
 python3 benchmarks/run_benchmarks.py --cases benchmarks/cases_fast.csv --repeats 1 --warmup 0 --timeout-seconds 30
 python3 benchmarks/plot_results.py
@@ -179,7 +180,7 @@ This writes:
 - `benchmarks/plots/runtime_vs_input_vertices.svg`
 - `benchmarks/plots/memory_vs_input_vertices.svg`
 
-The runner uses Python's high-resolution process timing for runtime and `/usr/bin/time -v` to collect:
+The runner uses Python's high-resolution process timing for runtime and `/usr/bin/time -v` for:
 
 - elapsed wall-clock time
 - maximum resident set size in kilobytes
@@ -195,7 +196,7 @@ The most relevant CSV columns for an experimental evaluation are:
 - `max_rss_mean_kb`
 - `max_rss_max_kb`
 
-The repository provides two benchmark manifests:
+The repository provides three benchmark manifests:
 
 - [`benchmarks/cases_fast.csv`](benchmarks/cases_fast.csv) for the quickest usable run
 - [`benchmarks/cases_quick.csv`](benchmarks/cases_quick.csv) for a short run while drafting your report
@@ -209,17 +210,20 @@ python3 benchmarks/run_benchmarks.py --cases benchmarks/cases_fast.csv --repeats
 
 ### Experimental Evaluation
 
-The most recent local benchmark summary from [`benchmarks/results.csv`](benchmarks/results.csv) is:
+The most recent local benchmark summary from `benchmarks/results.csv` is:
 
 | Case | Input vertices | Rings | Mean runtime (ms) | Mean max RSS (KB) | Status |
 |---|---:|---:|---:|---:|---|
-| `triangle` | 3 | 1 | 4.631 | 4053.3 | `ok` |
-| `rectangle_hole` | 12 | 3 | 4.660 | 4096.0 | `ok` |
-| `rectangle_two_holes` | 12 | 3 | 4.365 | 4053.3 | `ok` |
-| `cushion_hexagonal_hole` | 22 | 2 | 4.507 | 4053.3 | `ok` |
-| `blob_two_holes` | 36 | 3 | 4.422 | 4096.0 | `ok` |
-| `wavy_three_holes` | 43 | 4 | 4.408 | 4096.0 | `ok` |
-| `lake_two_islands` | 81 | 3 | 4.961 | 4224.0 | `ok` |
-| `original_01` | 1860 | 1 | 5176.895 | 4772.0 | `ok` |
+| `triangle` | 3 | 1 | 8.127 | 3968 | `ok` |
+| `rectangle_hole` | 12 | 3 | 5.233 | 3968 | `ok` |
+| `rectangle_two_holes` | 12 | 3 | 4.915 | 3968 | `ok` |
+| `cushion_hexagonal_hole` | 22 | 2 | 4.912 | 4096 | `ok` |
+| `blob_two_holes` | 36 | 3 | 4.497 | 3968 | `ok` |
+| `wavy_three_holes` | 43 | 4 | 4.814 | 4096 | `ok` |
+| `lake_two_islands` | 81 | 3 | 5.405 | 4224 | `ok` |
+| `original_01` | 1860 | 1 | 12.071 | 4480 | `ok` |
+| `original_02` | 8605 | 1 | 48.422 | 6828 | `ok` |
+| `original_06` | 14122 | 1 | 84.087 | 8968 | `ok` |
+| `original_09` | 409998 | 1 | 6471.089 | 167672 | `ok` |
 
-In this run, memory usage stayed in a narrow band of roughly 4.0-4.8 MB, while runtime increased sharply once the input reached the larger `original_01` lake case. Larger instructor lake cases such as `original_02`, `original_06`, and `original_09` exceeded the configured timeout in broader benchmark runs, so the current implementation should be described as memory-efficient on the tested cases but not yet competitive on very large inputs.
+In this run, memory usage grew from roughly 4 MB on the smallest cases to about 167 MB on the 409,998-vertex `original_09` dataset, while runtime ranged from about 4.5-8.1 ms on the smallest cases to about 6.47 s on `original_09`. These results show that the implementation can process an instructor dataset well above the 100,000-vertex threshold within practical runtime on the test machine.

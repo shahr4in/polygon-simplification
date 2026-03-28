@@ -4,6 +4,27 @@ C++17 implementation of area and topology-preserving polygon simplification for 
 
 Source files are located under [`src`](src).
 
+## Requirements
+
+To build and run this project, you need:
+
+- a C++17-compatible compiler such as `g++`
+- `make`
+- a Unix-like shell environment
+- on Windows, WSL is recommended
+
+For benchmarking, you also need:
+
+- `python3`
+- `/usr/bin/time` with the `-v` option
+
+On Ubuntu or WSL, the basic toolchain can be installed with:
+
+```sh
+sudo apt update
+sudo apt install build-essential python3 time
+```
+
 ## Build
 
 Run:
@@ -211,6 +232,8 @@ python3 benchmarks/run_benchmarks.py --cases benchmarks/cases_fast.csv --repeats
 ### Experimental Evaluation
 
 The most recent local benchmark summary from `benchmarks/results.csv` is:
+
+This summary was generated from the broader `benchmarks/cases.csv` benchmark manifest.
 
 | Case | Input vertices | Rings | Mean runtime (ms) | Mean max RSS (KB) | Status |
 |---|---:|---:|---:|---:|---|

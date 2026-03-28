@@ -77,10 +77,15 @@ Debug and error messages are written to standard error.
 
 ## Tests
 
-The repository includes two lightweight sample cases under [`tests`](tests):
+The repository includes several standalone sample cases under [`tests`](tests):
 
 - [`tests/triangle.csv`](tests/triangle.csv) with expected output [`tests/triangle_target3.expected`](tests/triangle_target3.expected)
 - [`tests/rectangle_hole.csv`](tests/rectangle_hole.csv) with expected output [`tests/rectangle_hole_target11.expected`](tests/rectangle_hole_target11.expected)
+- [`tests/rectangle_two_holes.csv`](tests/rectangle_two_holes.csv) with expected output [`tests/rectangle_two_holes_target7.expected`](tests/rectangle_two_holes_target7.expected)
+- [`tests/cushion_hexagonal_hole.csv`](tests/cushion_hexagonal_hole.csv) with expected output [`tests/cushion_hexagonal_hole_target13.expected`](tests/cushion_hexagonal_hole_target13.expected)
+- [`tests/blob_two_holes.csv`](tests/blob_two_holes.csv) with expected output [`tests/blob_two_holes_target17.expected`](tests/blob_two_holes_target17.expected)
+- [`tests/wavy_three_holes.csv`](tests/wavy_three_holes.csv) with expected output [`tests/wavy_three_holes_target21.expected`](tests/wavy_three_holes_target21.expected)
+- [`tests/lake_two_islands.csv`](tests/lake_two_islands.csv) with expected output [`tests/lake_two_islands_target17.expected`](tests/lake_two_islands_target17.expected)
 
 These are small sanity checks for local development.
 
@@ -91,5 +96,7 @@ Example local checks:
 ```sh
 ./simplify tests/triangle.csv 3
 ./simplify tests/rectangle_hole.csv 11
+./simplify tests/rectangle_two_holes.csv 7
+./simplify tests/cushion_hexagonal_hole.csv 13
 ./area_and_topology_preserving_polygon_simplification test_cases/input_rectangle_with_two_holes.csv 7
 ```

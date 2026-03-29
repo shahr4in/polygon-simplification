@@ -130,8 +130,8 @@ Example local checks:
 The standalone cases under [`tests`](tests) are intended to be checked by diffing program output against the corresponding `*.expected` file. A typical check from WSL is:
 
 ```sh
-diff -u tests/triangle_target3.expected <(./simplify tests/triangle.csv 3)
-diff -u tests/rectangle_hole_target11.expected <(./simplify tests/rectangle_hole.csv 11)
+diff -u --strip-trailing-cr tests/triangle_target3.expected <(./simplify tests/triangle.csv 3)
+diff -u --strip-trailing-cr tests/rectangle_hole_target11.expected <(./simplify tests/rectangle_hole.csv 11)
 ```
 
 Recent local runs confirmed successful execution on the following representative inputs:

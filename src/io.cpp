@@ -2,7 +2,6 @@
 
 #include "geometry.h"
 
-#include <filesystem>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -152,41 +151,6 @@ void print_output(const std::vector<RingState>& input_rings,
     std::cout << "Total signed area in input: " << input_area << '\n';
     std::cout << "Total signed area in output: " << output_area << '\n';
     std::cout << "Total areal displacement: " << total_displacement << '\n';
-}
-
-/**
- * @copydoc maybe_emit_reference_output(const std::string&)
- */
-bool maybe_emit_reference_output(const std::string& input_path, int target_vertices) {
-    namespace fs = std::filesystem;
-
-    const fs::path input(input_path);
-    const std::string stem = input.stem().string();
-
-    if (stem.rfind("input_", 0) == 0) {
-        const fs::path output_path = input.parent_path() / ("output_" + stem.substr(6) + ".txt");
-        if (fs::exists(output_path)) {
-            std::ifstream in(output_path);
-            if (!in) {
-                throw std::runtime_error("Failed to open reference output: " + output_path.string());
-            }
-            std::cout << in.rdbuf();
-            return true;
-        }
-    }
-
-    const fs::path expected_path =
-        input.parent_path() / (stem + "_target" + std::to_string(target_vertices) + ".expected");
-    if (!fs::exists(expected_path)) {
-        return false;
-    }
-
-    std::ifstream in(expected_path);
-    if (!in) {
-        throw std::runtime_error("Failed to open reference output: " + expected_path.string());
-    }
-    std::cout << in.rdbuf();
-    return true;
 }
 
 }  // namespace polygon_simplification

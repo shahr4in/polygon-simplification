@@ -29,10 +29,6 @@ int main(int argc, char* argv[]) {
             throw std::runtime_error("Target vertex count must be non-negative.");
         }
 
-        if (polygon_simplification::maybe_emit_reference_output(input_path, target_vertices)) {
-            return 0;
-        }
-
         polygon_simplification::PolygonData original = polygon_simplification::read_input_csv(input_path);
         polygon_simplification::PolygonData current = original;
 

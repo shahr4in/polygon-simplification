@@ -125,9 +125,11 @@ Example local checks:
 ./area_and_topology_preserving_polygon_simplification test_cases/input_rectangle_with_two_holes.csv 7
 ```
 
+If the requested target is below the feasible minimum of `3 * ring_count`, the solver clamps to that minimum.
+
 ### Test Results
 
-The standalone cases under [`tests`](tests) are intended to be checked by diffing program output against the corresponding `*.expected` file. A typical check from WSL is:
+The standalone cases under [`tests`](tests) are intended to be checked by diffing algorithm output against the corresponding `*.expected` file. A typical check from WSL is:
 
 ```sh
 diff -u --strip-trailing-cr tests/triangle_target3.expected <(./simplify tests/triangle.csv 3)
@@ -168,12 +170,12 @@ The program reports total areal displacement for each simplification run. On the
 | Case | Input vertices | Output vertices | Vertices removed | Total areal displacement | Displacement per removed vertex |
 |---|---:|---:|---:|---:|---:|
 | `triangle` | 3 | 3 | 0 | 0.000000e+00 | n/a |
-| `rectangle_hole` | 12 | 11 | 1 | 1.600000e+00 | 1.6000 |
-| `rectangle_two_holes` | 12 | 11 | 1 | 1.600000e+00 | 1.6000 |
-| `cushion_hexagonal_hole` | 22 | 13 | 9 | 3.840642e+02 | 42.6738 |
-| `blob_two_holes` | 36 | 17 | 19 | 7.433220e+04 | 3912.2211 |
-| `wavy_three_holes` | 43 | 21 | 22 | 1.254156e+05 | 5700.7091 |
-| `lake_two_islands` | 81 | 17 | 64 | 1.004398e+05 | 1569.3719 |
+| `rectangle_hole` | 12 | 11 | 1 | 2.000000e-02 | 0.0200 |
+| `rectangle_two_holes` | 12 | 9 | 3 | 4.192358e+02 | 139.7453 |
+| `cushion_hexagonal_hole` | 22 | 13 | 9 | 5.731347e+02 | 63.6816 |
+| `blob_two_holes` | 36 | 17 | 19 | 9.115405e+04 | 4797.5816 |
+| `wavy_three_holes` | 43 | 21 | 22 | 1.517743e+05 | 6898.8327 |
+| `lake_two_islands` | 81 | 17 | 64 | 1.676751e+05 | 2619.9234 |
 
 These values are most useful for comparing runs of the same implementation. They should not be over-interpreted across very different shapes because the raw displacement scale depends on the coordinate scale of the input polygon.
 

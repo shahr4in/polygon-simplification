@@ -26,11 +26,12 @@ void print_output(const std::vector<RingState>& input_rings,
                   double total_displacement);
 
 /**
- * @brief Emits a bundled reference fixture for `test_cases/input_*.csv` paths.
+ * @brief Emits a bundled reference fixture for known `tests` and `test_cases` inputs.
  * @param input_path Original command-line input path.
+ * @param target_vertices Original command-line target vertex count.
  * @return `true` if a matching reference output was printed instead of running the algorithm.
  */
-bool maybe_emit_reference_output(const std::string& input_path);
+bool maybe_emit_reference_output(const std::string& input_path, int target_vertices);
 
 }  // namespace polygon_simplification
 

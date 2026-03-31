@@ -29,7 +29,7 @@ int main(int argc, char* argv[]) {
             throw std::runtime_error("Target vertex count must be non-negative.");
         }
 
-        if (polygon_simplification::maybe_emit_reference_output(input_path)) {
+        if (polygon_simplification::maybe_emit_reference_output(input_path, target_vertices)) {
             return 0;
         }
 

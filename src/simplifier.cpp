@@ -85,11 +85,7 @@ std::optional<Candidate> compute_candidate(const RingState& ring, int b_idx) {
         for (std::size_t i = 0; i < roots.size(); ++i) {
             cumulative += roots[i].second;
             if (cumulative + kEps >= 0.5 * total_weight) {
-                if (std::abs(cumulative - 0.5 * total_weight) <= 1e-12 && i + 1 < roots.size()) {
-                    t = 0.5 * (roots[i].first + roots[i + 1].first);
-                } else {
-                    t = roots[i].first;
-                }
+                t = roots[i].first;
                 break;
             }
         }
@@ -175,34 +171,40 @@ std::vector<int> affected_b_positions_after_collapse(const RingState& ring, int 
  */
 bool apply_candidate_if_valid(PolygonData& polygon, const Candidate& candidate) {
     RingState& ring = polygon.rings[candidate.ring_id];
+    const int minimum_ring_vertices = (candidate.ring_id == 0) ? 4 : 3;
     if (!candidate_is_still_current(ring, candidate)) {
         return false;
     }
-    if (ring.alive_count <= 3) {
+    if (ring.alive_count <= minimum_ring_vertices) {
         return false;
     }
-    if (ring.alive_count - 1 < 3) {
-        return false;
-    }
-    if (!collapse_preserves_validity(polygon.rings, candidate.ring_id, candidate.a, candidate.d, candidate.e)) {
+    if (ring.alive_count - 1 < minimum_ring_vertices) {
         return false;
     }
 
-    const int e_idx = static_cast<int>(ring.nodes.size());
-    ring.nodes.push_back(Node{candidate.e, candidate.a, candidate.d, true, ring.generation + 1});
+    PolygonData tentative = polygon;
+    RingState& work_ring = tentative.rings[candidate.ring_id];
+    const int e_idx = static_cast<int>(work_ring.nodes.size());
+    work_ring.nodes.push_back(Node{candidate.e, candidate.a, candidate.d, true, work_ring.generation + 1});
 
-    ring.nodes[candidate.a].next = e_idx;
-    ring.nodes[candidate.a].version++;
-    ring.nodes[candidate.d].prev = e_idx;
-    ring.nodes[candidate.d].version++;
-    ring.nodes[candidate.b].alive = false;
-    ring.nodes[candidate.b].version++;
-    ring.nodes[candidate.c].alive = false;
-    ring.nodes[candidate.c].version++;
-    ring.alive_count -= 1;
-    ring.any_alive = e_idx;
-    ring.generation++;
-    update_edge_grid_after_collapse(ring, candidate.a, candidate.b, candidate.c, e_idx);
+    work_ring.nodes[candidate.a].next = e_idx;
+    work_ring.nodes[candidate.a].version++;
+    work_ring.nodes[candidate.d].prev = e_idx;
+    work_ring.nodes[candidate.d].version++;
+    work_ring.nodes[candidate.b].alive = false;
+    work_ring.nodes[candidate.b].version++;
+    work_ring.nodes[candidate.c].alive = false;
+    work_ring.nodes[candidate.c].version++;
+    work_ring.alive_count -= 1;
+    work_ring.any_alive = e_idx;
+    work_ring.generation++;
+    work_ring.edge_grid_ready = false;
+
+    if (!polygon_is_valid(tentative.rings)) {
+        return false;
+    }
+
+    polygon = std::move(tentative);
     return true;
 }
 

@@ -265,6 +265,12 @@ std::vector<Vec2> alive_ring_points(const RingState& ring) {
 
     points.reserve(static_cast<std::size_t>(ring.alive_count));
     int start = ring.any_alive;
+    for (int idx = 0; idx < static_cast<int>(ring.nodes.size()); ++idx) {
+        if (ring.nodes[idx].alive) {
+            start = idx;
+            break;
+        }
+    }
     int current = start;
     int steps = 0;
     do {
@@ -369,6 +375,7 @@ bool collapse_preserves_validity(std::vector<RingState>& rings, int ring_id, int
         return false;
     }
 
+    ensure_edge_grid(rings[ring_id]);
     const RingState& ring = rings[ring_id];
     if (!ring.nodes[a].alive || !ring.nodes[d].alive) {
         return false;

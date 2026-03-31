@@ -265,12 +265,6 @@ std::vector<Vec2> alive_ring_points(const RingState& ring) {
 
     points.reserve(static_cast<std::size_t>(ring.alive_count));
     int start = ring.any_alive;
-    for (int idx = 0; idx < static_cast<int>(ring.nodes.size()); ++idx) {
-        if (ring.nodes[idx].alive) {
-            start = idx;
-            break;
-        }
-    }
     int current = start;
     int steps = 0;
     do {

@@ -58,7 +58,6 @@ std::optional<Candidate> compute_candidate(const RingState& ring, int b_idx) {
     };
 
     const std::array<std::pair<Vec2, Vec2>, 3> segments{{{a, bpt}, {bpt, c}, {c, d}}};
-    std::vector<std::pair<double, double>> roots;
     std::vector<Term> terms;
     terms.reserve(3);
     for (const auto& seg : segments) {
@@ -68,26 +67,68 @@ std::optional<Candidate> compute_candidate(const RingState& ring, int b_idx) {
         const double alpha = cross(s, u);
         const double beta = cross(s, e0 - p);
         terms.push_back({alpha, beta});
-        if (std::abs(alpha) > kEps) {
-            roots.push_back({-beta / alpha, std::abs(alpha)});
-        }
     }
 
     double t = 0.0;
-    if (!roots.empty()) {
-        std::sort(roots.begin(), roots.end(),
-                  [](const auto& lhs, const auto& rhs) { return lhs.first < rhs.first; });
-        double total_weight = 0.0;
-        for (const auto& [_, weight] : roots) {
-            total_weight += weight;
-        }
-        double cumulative = 0.0;
-        for (std::size_t i = 0; i < roots.size(); ++i) {
-            cumulative += roots[i].second;
-            if (cumulative + kEps >= 0.5 * total_weight) {
-                t = roots[i].first;
-                break;
+
+    {
+        const double alpha_AB = terms[0].alpha;
+        const double beta_AB  = terms[0].beta;
+        const double alpha_BC = terms[1].alpha;
+        const double beta_BC  = terms[1].beta;
+        const double alpha_CD = terms[2].alpha;
+        const double beta_CD  = terms[2].beta;
+
+        auto disp_at = [&](double tv) {
+            double d = 0.0;
+            for (const Term& term : terms) {
+                d += std::abs(term.alpha * tv + term.beta);
             }
+            return d;
+        };
+
+        const bool has_AB = std::abs(alpha_AB) > kEps;
+        const bool has_BC = std::abs(alpha_BC) > kEps;
+        const bool has_CD = std::abs(alpha_CD) > kEps;
+
+        if (has_AB && has_CD) {
+            const double t_AB = -beta_AB / alpha_AB;
+            const double t_CD = -beta_CD / alpha_CD;
+            const double d_AB = disp_at(t_AB);
+            const double d_CD = disp_at(t_CD);
+            if (std::abs(d_AB - d_CD) <= kEps) {
+                t = (t_AB + t_CD) / 2.0;
+            } else {
+                t = (d_AB <= d_CD) ? t_AB : t_CD;
+            }
+        } else if (has_AB && has_BC) {
+
+            const double t_AB = -beta_AB / alpha_AB;
+            const double t_BC = -beta_BC / alpha_BC;
+            const double d_AB = disp_at(t_AB);
+            const double d_BC = disp_at(t_BC);
+            if (std::abs(d_AB - d_BC) <= kEps) {
+                t = (t_AB + t_BC) / 2.0;
+            } else {
+                t = (d_AB <= d_BC) ? t_AB : t_BC;
+            }
+        } else if (has_CD && has_BC) {
+
+            const double t_BC = -beta_BC / alpha_BC;
+            const double t_CD = -beta_CD / alpha_CD;
+            const double d_BC = disp_at(t_BC);
+            const double d_CD = disp_at(t_CD);
+            if (std::abs(d_BC - d_CD) <= kEps) {
+                t = (t_BC + t_CD) / 2.0;
+            } else {
+                t = (d_BC <= d_CD) ? t_BC : t_CD;
+            }
+        } else if (has_AB) {
+            t = -beta_AB / alpha_AB;
+        } else if (has_CD) {
+            t = -beta_CD / alpha_CD;
+        } else if (has_BC) {
+            t = -beta_BC / alpha_BC;
         }
     }
 
@@ -171,7 +212,7 @@ std::vector<int> affected_b_positions_after_collapse(const RingState& ring, int 
  */
 bool apply_candidate_if_valid(PolygonData& polygon, const Candidate& candidate) {
     RingState& ring = polygon.rings[candidate.ring_id];
-    const int minimum_ring_vertices = (candidate.ring_id == 0) ? 4 : 3;
+    const int minimum_ring_vertices = 3;
     if (!candidate_is_still_current(ring, candidate)) {
         return false;
     }
